@@ -7,6 +7,9 @@ export function CartProvider({ children }) {
   const [wishlist, setWishlist] = useState([])
   const [cartOpen, setCartOpen] = useState(false)
   const [wishlistOpen, setWishlistOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [searchOpen, setSearchOpen] = useState(false)
 
   // Carrito
   function addToCart(product) {
@@ -41,12 +44,31 @@ export function CartProvider({ children }) {
     return wishlist.some(i => i.id === id)
   }
 
+  // Búsqueda
+  function handleSearch(query, products) {
+    setSearchQuery(query)
+    if (!query.trim()) {
+      setSearchResults([])
+      setSearchOpen(false)
+      return
+    }
+    const q = query.toLowerCase()
+    const results = products.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      p.brand.toLowerCase().includes(q) ||
+      p.categoria.toLowerCase().includes(q)
+    )
+    setSearchResults(results)
+    setSearchOpen(true)
+  }
+
   return (
     <CartContext.Provider value={{
       cart, addToCart, removeFromCart, changeQty, cartTotal, cartSubtotal,
       wishlist, toggleWishlist, isInWishlist,
       cartOpen, setCartOpen,
-      wishlistOpen, setWishlistOpen
+      wishlistOpen, setWishlistOpen,
+      searchQuery, searchResults, searchOpen, setSearchOpen, handleSearch
     }}>
       {children}
     </CartContext.Provider>

@@ -1,7 +1,8 @@
 import { useCart } from '../../context/CartContext'
+import SearchBar from '../ui/SearchBar'
 
 function Header() {
-  const { cartTotal, wishlist, setCartOpen } = useCart()
+  const { cartTotal, wishlist, setCartOpen, setWishlistOpen } = useCart()
 
   return (
     <header className="header">
@@ -10,16 +11,10 @@ function Header() {
           Ferretería <span>Ernesto's</span>
         </div>
 
-        <div className="header__search">
-          <svg className="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35"/>
-          </svg>
-          <input type="text" placeholder="Buscar productos, herramientas, materiales..." autoComplete="off" />
-        </div>
+        <SearchBar />
 
         <div className="header__icons">
-          <button className="header__icon-btn" aria-label="Favoritos">
+          <button className="header__icon-btn" aria-label="Favoritos" onClick={() => setWishlistOpen(true)}>
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
             </svg>
