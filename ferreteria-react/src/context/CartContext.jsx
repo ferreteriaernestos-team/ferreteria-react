@@ -10,6 +10,7 @@ export function CartProvider({ children }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [searchOpen, setSearchOpen] = useState(false)
+  const [authOpen, setAuthOpen] = useState(false)
 
   // Carrito
   function addToCart(product) {
@@ -68,7 +69,8 @@ export function CartProvider({ children }) {
       wishlist, toggleWishlist, isInWishlist,
       cartOpen, setCartOpen,
       wishlistOpen, setWishlistOpen,
-      searchQuery, searchResults, searchOpen, setSearchOpen, handleSearch
+      searchQuery, searchResults, searchOpen, setSearchOpen, handleSearch,
+      authOpen, setAuthOpen
     }}>
       {children}
     </CartContext.Provider>

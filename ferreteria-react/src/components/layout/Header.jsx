@@ -2,7 +2,7 @@ import { useCart } from '../../context/CartContext'
 import SearchBar from '../ui/SearchBar'
 
 function Header() {
-  const { cartTotal, wishlist, setCartOpen, setWishlistOpen } = useCart()
+  const { cartTotal, wishlist, setCartOpen, setWishlistOpen, setAuthOpen } = useCart()
 
   return (
     <header className="header">
@@ -30,7 +30,7 @@ function Header() {
             {cartTotal > 0 && <span className="cart-badge">{cartTotal}</span>}
           </button>
 
-          <button className="header__icon-btn" aria-label="Cuenta">
+          <button className="header__icon-btn" aria-label="Cuenta" onClick={() => setAuthOpen(true)}>
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
             </svg>

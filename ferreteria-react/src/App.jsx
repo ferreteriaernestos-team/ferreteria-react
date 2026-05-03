@@ -5,6 +5,7 @@ import Footer from './components/layout/Footer'
 import HomePage from './pages/HomePage'
 import CartSidebar from './components/ui/CartSidebar'
 import WishlistSidebar from './components/ui/WishlistSidebar'
+import AuthModal from './components/ui/AuthModal'
 import './index.css'
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
       <Footer />
       <CartSidebar />
       <WishlistSidebar />
+      <AuthModal />
     </div>
   )
 }
