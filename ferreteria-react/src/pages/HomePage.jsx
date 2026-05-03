@@ -1,10 +1,12 @@
 import Hero from '../components/ui/Hero'
 import ProductCard from '../components/ui/ProductCard'
+import Breadcrumb from '../components/ui/Breadcrumb'
 import { PRODUCTS, CATEGORIES } from '../data/products'
 
 function HomePage() {
   return (
     <main>
+      <Breadcrumb current="Productos" />
       <Hero />
 
       {/* Categorías */}

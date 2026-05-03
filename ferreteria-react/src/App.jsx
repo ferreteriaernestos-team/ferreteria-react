@@ -6,11 +6,13 @@ import HomePage from './pages/HomePage'
 import CartSidebar from './components/ui/CartSidebar'
 import WishlistSidebar from './components/ui/WishlistSidebar'
 import AuthModal from './components/ui/AuthModal'
+import PromoBanner from './components/ui/PromoBanner'
 import './index.css'
 
 function App() {
   return (
     <div>
+      <PromoBanner />
       <TopBar />
       <Header />
       <Navbar />
