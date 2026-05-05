@@ -11,6 +11,17 @@ export function CartProvider({ children }) {
   const [searchResults, setSearchResults] = useState([])
   const [searchOpen, setSearchOpen] = useState(false)
   const [authOpen, setAuthOpen] = useState(false)
+  const [toasts, setToasts] = useState([])
+
+  // Toasts
+  function showToast(message) {
+    const id = Date.now()
+    setToasts(prev => [...prev, { id, message }])
+  }
+
+  function removeToast(id) {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }
 
   // Carrito
   function addToCart(product) {
@@ -19,6 +30,7 @@ export function CartProvider({ children }) {
       if (exists) return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i)
       return [...prev, { ...product, qty: 1 }]
     })
+    showToast(`${product.name} agregado al carrito`)
   }
 
   function removeFromCart(id) {
@@ -36,7 +48,11 @@ export function CartProvider({ children }) {
   function toggleWishlist(product) {
     setWishlist(prev => {
       const exists = prev.find(i => i.id === product.id)
-      if (exists) return prev.filter(i => i.id !== product.id)
+      if (exists) {
+        showToast(`${product.name} eliminado de favoritos`)
+        return prev.filter(i => i.id !== product.id)
+      }
+      showToast(`${product.name} agregado a favoritos ❤️`)
       return [...prev, product]
     })
   }
@@ -70,7 +86,8 @@ export function CartProvider({ children }) {
       cartOpen, setCartOpen,
       wishlistOpen, setWishlistOpen,
       searchQuery, searchResults, searchOpen, setSearchOpen, handleSearch,
-      authOpen, setAuthOpen
+      authOpen, setAuthOpen,
+      toasts, showToast, removeToast
     }}>
       {children}
     </CartContext.Provider>

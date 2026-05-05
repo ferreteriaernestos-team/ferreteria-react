@@ -7,6 +7,7 @@ import CartSidebar from './components/ui/CartSidebar'
 import WishlistSidebar from './components/ui/WishlistSidebar'
 import AuthModal from './components/ui/AuthModal'
 import PromoBanner from './components/ui/PromoBanner'
+import ToastContainer from './components/ui/ToastContainer'
 import './index.css'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
       <CartSidebar />
       <WishlistSidebar />
       <AuthModal />
+      <ToastContainer />
     </div>
   )
 }
