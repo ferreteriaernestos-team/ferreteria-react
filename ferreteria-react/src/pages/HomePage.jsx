@@ -1,10 +1,25 @@
+import { useState } from 'react'
 import Hero from '../components/ui/Hero'
 import ProductCard from '../components/ui/ProductCard'
 import Breadcrumb from '../components/ui/Breadcrumb'
 import Benefits from '../components/ui/Benefits'
+import ProductFilters from '../components/ui/ProductFilters'
 import { PRODUCTS, CATEGORIES } from '../data/products'
 
 function HomePage() {
+  const [filteredProducts, setFilteredProducts] = useState(PRODUCTS)
+
+  function handleFilter({ selectedCats, selectedBrands, maxPrice, onlyStock }) {
+    const result = PRODUCTS.filter(p => {
+      const catOk = selectedCats.length === 0 || selectedCats.includes(p.categoria)
+      const brandOk = selectedBrands.length === 0 || selectedBrands.includes(p.brand)
+      const priceOk = p.price <= maxPrice
+      const stockOk = !onlyStock || p.inStock
+      return catOk && brandOk && priceOk && stockOk
+    })
+    setFilteredProducts(result)
+  }
+
   return (
     <main>
       <Breadcrumb current="Productos" />
@@ -32,22 +47,30 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Productos */}
+      {/* Productos con filtros */}
       <section className="section section--gray">
         <div className="container">
           <div className="section__header">
             <h2 className="section__title">Productos destacados</h2>
             <p className="section__subtitle">Las mejores ofertas en herramientas y materiales</p>
           </div>
-          <div className="products-grid">
-            {PRODUCTS.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+          <div className="products-layout">
+            <ProductFilters onFilter={handleFilter} />
+            <div className="products-grid">
+              {filteredProducts.length === 0 ? (
+                <p style={{color:'var(--subtle)', gridColumn:'1/-1', padding:'2rem'}}>
+                  No se encontraron productos con esos filtros.
+                </p>
+              ) : (
+                filteredProducts.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))
+              )}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Beneficios */}
       <Benefits />
     </main>
   )
