@@ -1,6 +1,7 @@
 import Hero from '../components/ui/Hero'
 import ProductCard from '../components/ui/ProductCard'
 import Breadcrumb from '../components/ui/Breadcrumb'
+import Benefits from '../components/ui/Benefits'
 import { PRODUCTS, CATEGORIES } from '../data/products'
 
 function HomePage() {
@@ -45,6 +46,9 @@ function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Beneficios */}
+      <Benefits />
     </main>
   )
 }

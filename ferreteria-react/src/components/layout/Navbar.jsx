@@ -1,8 +1,40 @@
+import { useState } from 'react'
+
+const DEPARTMENTS = [
+  {
+    name: 'Construcción',
+    icon: '🔨',
+    items: ['Cemento y Concreto', 'Ladrillos y Blocks', 'Arena y Grava', 'Varillas y Acero']
+  },
+  {
+    name: 'Herramientas',
+    icon: '🔧',
+    items: ['Herramientas Eléctricas', 'Herramientas Manuales', 'Taladros', 'Sierras y Cortadoras']
+  },
+  {
+    name: 'Eléctrico',
+    icon: '⚡',
+    items: ['Cables y Alambres', 'Interruptores', 'Tomacorrientes', 'Iluminación']
+  },
+  {
+    name: 'Fontanería',
+    icon: '💧',
+    items: ['Tuberías PVC', 'Llaves y Grifos', 'Accesorios de Baño', 'Bombas de Agua']
+  },
+]
+
 function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
-    <nav className="navbar">
+    <nav className="navbar" style={{position:'relative'}}>
       <div className="container">
-        <button className="navbar__depts">
+        <button
+          className="navbar__depts"
+          onMouseEnter={() => setMenuOpen(true)}
+          onMouseLeave={() => setMenuOpen(false)}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
             <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
@@ -16,6 +48,28 @@ function Navbar() {
           <a href="#">Promociones</a>
           <a href="#">Marcas</a>
           <a href="#">Ideas y soluciones</a>
+        </div>
+      </div>
+
+      {/* Mega Menu */}
+      <div
+        className={`mega-menu ${menuOpen ? 'open' : ''}`}
+        onMouseEnter={() => setMenuOpen(true)}
+        onMouseLeave={() => setMenuOpen(false)}
+      >
+        <div className="container">
+          <div className="mega-menu__inner">
+            {DEPARTMENTS.map((dept, i) => (
+              <div key={i} className="mega-menu__col">
+                <h3>{dept.icon} {dept.name}</h3>
+                <ul>
+                  {dept.items.map((item, j) => (
+                    <li key={j}><a href="#">{item}</a></li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </nav>
