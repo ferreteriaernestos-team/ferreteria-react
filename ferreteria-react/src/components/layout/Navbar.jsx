@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const DEPARTMENTS = [
   {
@@ -45,7 +46,7 @@ function Navbar() {
           </svg>
         </button>
         <div className="navbar__links">
-          <a href="#">Promociones</a>
+          <Link to="/promociones">Promociones</Link>
           <a href="#">Marcas</a>
           <a href="#">Ideas y soluciones</a>
         </div>
