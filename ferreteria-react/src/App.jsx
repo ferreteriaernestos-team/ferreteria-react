@@ -6,6 +6,7 @@ import Footer from './components/layout/Footer'
 import HomePage from './pages/HomePage'
 import PromocionesPage from './pages/PromocionesPage'
 import MarcasPage from './pages/MarcasPage'
+import MarcaPage from './pages/MarcaPage'
 import IdeasPage from './pages/IdeasPage'
 import CategoriaPage from './pages/CategoriaPage'
 import CartSidebar from './components/ui/CartSidebar'
@@ -26,6 +27,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/promociones" element={<PromocionesPage />} />
         <Route path="/marcas" element={<MarcasPage />} />
+        <Route path="/marca/:nombre" element={<MarcaPage />} />
         <Route path="/ideas" element={<IdeasPage />} />
         <Route path="/categoria/:nombre" element={<CategoriaPage />} />
       </Routes>
