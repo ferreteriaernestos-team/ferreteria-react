@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Hero from '../components/ui/Hero'
 import ProductCard from '../components/ui/ProductCard'
 import Breadcrumb from '../components/ui/Breadcrumb'
@@ -8,6 +9,7 @@ import { PRODUCTS, CATEGORIES } from '../data/products'
 
 function HomePage() {
   const [filteredProducts, setFilteredProducts] = useState(PRODUCTS)
+  const navigate = useNavigate()
 
   function handleFilter({ selectedCats, selectedBrands, maxPrice, onlyStock }) {
     const result = PRODUCTS.filter(p => {
@@ -34,7 +36,12 @@ function HomePage() {
           </div>
           <div className="categories-grid">
             {CATEGORIES.map((cat, i) => (
-              <div key={i} className="category-card">
+              <div
+                key={i}
+                className="category-card"
+                style={{cursor:'pointer'}}
+                onClick={() => navigate(`/categoria/${cat.name}`)}
+              >
                 <img src={cat.img} alt={cat.name} loading="lazy" />
                 <div className="category-card__overlay"></div>
                 <div className="category-card__label">

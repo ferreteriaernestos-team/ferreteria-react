@@ -46,15 +46,14 @@ export function CartProvider({ children }) {
 
   // Wishlist
   function toggleWishlist(product) {
-    setWishlist(prev => {
-      const exists = prev.find(i => i.id === product.id)
-      if (exists) {
-        showToast(`${product.name} eliminado de favoritos`)
-        return prev.filter(i => i.id !== product.id)
-      }
+    const exists = wishlist.find(i => i.id === product.id)
+    if (exists) {
+      setWishlist(prev => prev.filter(i => i.id !== product.id))
+      showToast(`${product.name} eliminado de favoritos`)
+    } else {
+      setWishlist(prev => [...prev, product])
       showToast(`${product.name} agregado a favoritos ❤️`)
-      return [...prev, product]
-    })
+    }
   }
 
   function isInWishlist(id) {
