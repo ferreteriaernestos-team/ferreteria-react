@@ -9,6 +9,7 @@ import MarcasPage from './pages/MarcasPage'
 import MarcaPage from './pages/MarcaPage'
 import IdeasPage from './pages/IdeasPage'
 import CategoriaPage from './pages/CategoriaPage'
+import NotFoundPage from './pages/NotFoundPage'
 import CartSidebar from './components/ui/CartSidebar'
 import WishlistSidebar from './components/ui/WishlistSidebar'
 import AuthModal from './components/ui/AuthModal'
@@ -30,6 +31,7 @@ function App() {
         <Route path="/marca/:nombre" element={<MarcaPage />} />
         <Route path="/ideas" element={<IdeasPage />} />
         <Route path="/categoria/:nombre" element={<CategoriaPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />
       <CartSidebar />
