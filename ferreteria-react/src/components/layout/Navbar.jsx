@@ -2,26 +2,10 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const DEPARTMENTS = [
-  {
-    name: 'Construcción',
-    icon: '🔨',
-    items: ['Cemento y Concreto', 'Ladrillos y Blocks', 'Arena y Grava', 'Varillas y Acero']
-  },
-  {
-    name: 'Herramientas',
-    icon: '🔧',
-    items: ['Herramientas Eléctricas', 'Herramientas Manuales', 'Taladros', 'Sierras y Cortadoras']
-  },
-  {
-    name: 'Eléctrico',
-    icon: '⚡',
-    items: ['Cables y Alambres', 'Interruptores', 'Tomacorrientes', 'Iluminación']
-  },
-  {
-    name: 'Fontanería',
-    icon: '💧',
-    items: ['Tuberías PVC', 'Llaves y Grifos', 'Accesorios de Baño', 'Bombas de Agua']
-  },
+  { name: 'Construcción', icon: '🔨', items: ['Cemento y Concreto', 'Ladrillos y Blocks', 'Arena y Grava', 'Varillas y Acero'] },
+  { name: 'Herramientas', icon: '🔧', items: ['Herramientas Eléctricas', 'Herramientas Manuales', 'Taladros', 'Sierras y Cortadoras'] },
+  { name: 'Eléctrico',    icon: '⚡', items: ['Cables y Alambres', 'Interruptores', 'Tomacorrientes', 'Iluminación'] },
+  { name: 'Fontanería',   icon: '💧', items: ['Tuberías PVC', 'Llaves y Grifos', 'Accesorios de Baño', 'Bombas de Agua'] },
 ]
 
 function Navbar() {
@@ -48,7 +32,7 @@ function Navbar() {
         <div className="navbar__links">
           <Link to="/promociones">Promociones</Link>
           <Link to="/marcas">Marcas</Link>
-          <a href="#">Ideas y soluciones</a>
+          <Link to="/ideas">Ideas y soluciones</Link>
         </div>
       </div>
 

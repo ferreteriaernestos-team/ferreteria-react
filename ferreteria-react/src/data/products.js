@@ -30,3 +30,12 @@ export const BRANDS = [
   { name: 'Black & Decker', logo: '⚫', desc: 'Soluciones para el hogar y profesionales',     products: 20 },
   { name: 'Irwin',          logo: '🟢', desc: 'Herramientas de corte y sujeción',             products: 12 },
 ]
+
+export const IDEAS = [
+  { title:'Cómo instalar una llave de agua',    desc:'Guía paso a paso para cambiar o instalar llaves de agua en tu hogar sin necesidad de un plomero.', img:'https://images.unsplash.com/photo-1503788943072-cd614c3056cf?w=400&q=80', tag:'Fontanería',   tiempo:'30 min' },
+  { title:'Pintar paredes como un profesional',  desc:'Técnicas y consejos para lograr un acabado perfecto en tus paredes con los productos correctos.',   img:'https://images.unsplash.com/photo-1562259929-b4e1fd3aef09?w=400&q=80', tag:'Pintura',      tiempo:'2 horas' },
+  { title:'Instalar un tomacorriente',           desc:'Aprende a instalar o reemplazar tomacorrientes de forma segura siguiendo el código eléctrico.',     img:'https://images.unsplash.com/photo-1555664424-778a1e5e1b48?w=400&q=80', tag:'Eléctrico',    tiempo:'45 min' },
+  { title:'Construir una pared de block',        desc:'Todo lo que necesitas saber para levantar una pared de block resistente y bien nivelada.',          img:'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80', tag:'Construcción', tiempo:'1 día' },
+  { title:'Cómo usar un taladro correctamente',  desc:'Guía básica para principiantes sobre el uso seguro y efectivo del taladro en diferentes materiales.',img:'https://images.unsplash.com/photo-1546827209-a218e99fdbe9?w=400&q=80', tag:'Herramientas', tiempo:'15 min' },
+  { title:'Medir y nivelar como experto',        desc:'Usa correctamente los instrumentos de medición para obtener resultados precisos en tus proyectos.', img:'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=400&q=80', tag:'Medición',     tiempo:'20 min' },
+]

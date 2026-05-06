@@ -6,6 +6,7 @@ import Footer from './components/layout/Footer'
 import HomePage from './pages/HomePage'
 import PromocionesPage from './pages/PromocionesPage'
 import MarcasPage from './pages/MarcasPage'
+import IdeasPage from './pages/IdeasPage'
 import CartSidebar from './components/ui/CartSidebar'
 import WishlistSidebar from './components/ui/WishlistSidebar'
 import AuthModal from './components/ui/AuthModal'
@@ -24,6 +25,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/promociones" element={<PromocionesPage />} />
         <Route path="/marcas" element={<MarcasPage />} />
+        <Route path="/ideas" element={<IdeasPage />} />
       </Routes>
       <Footer />
       <CartSidebar />

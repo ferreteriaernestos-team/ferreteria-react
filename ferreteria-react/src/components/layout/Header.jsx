@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import SearchBar from '../ui/SearchBar'
 
@@ -7,9 +8,9 @@ function Header() {
   return (
     <header className="header">
       <div className="container">
-        <div className="header__logo">
+        <Link to="/" className="header__logo">
           Ferretería <span>Ernesto's</span>
-        </div>
+        </Link>
 
         <SearchBar />
 
