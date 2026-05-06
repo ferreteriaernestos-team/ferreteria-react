@@ -10,6 +10,7 @@ import MarcaPage from './pages/MarcaPage'
 import IdeasPage from './pages/IdeasPage'
 import CategoriaPage from './pages/CategoriaPage'
 import NotFoundPage from './pages/NotFoundPage'
+import AdminPage from './pages/admin/AdminPage'
 import CartSidebar from './components/ui/CartSidebar'
 import WishlistSidebar from './components/ui/WishlistSidebar'
 import AuthModal from './components/ui/AuthModal'
@@ -20,24 +21,34 @@ import './index.css'
 function App() {
   return (
     <BrowserRouter>
-      <PromoBanner />
-      <TopBar />
-      <Header />
-      <Navbar />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/promociones" element={<PromocionesPage />} />
-        <Route path="/marcas" element={<MarcasPage />} />
-        <Route path="/marca/:nombre" element={<MarcaPage />} />
-        <Route path="/ideas" element={<IdeasPage />} />
-        <Route path="/categoria/:nombre" element={<CategoriaPage />} />
-        <Route path="*" element={<NotFoundPage />} />
+        {/* Ruta admin sin header/footer */}
+        <Route path="/admin" element={<AdminPage />} />
+
+        {/* Rutas normales con header/footer */}
+        <Route path="/*" element={
+          <>
+            <PromoBanner />
+            <TopBar />
+            <Header />
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/promociones" element={<PromocionesPage />} />
+              <Route path="/marcas" element={<MarcasPage />} />
+              <Route path="/marca/:nombre" element={<MarcaPage />} />
+              <Route path="/ideas" element={<IdeasPage />} />
+              <Route path="/categoria/:nombre" element={<CategoriaPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+            <Footer />
+            <CartSidebar />
+            <WishlistSidebar />
+            <AuthModal />
+            <ToastContainer />
+          </>
+        } />
       </Routes>
-      <Footer />
-      <CartSidebar />
-      <WishlistSidebar />
-      <AuthModal />
-      <ToastContainer />
     </BrowserRouter>
   )
 }
