@@ -21,3 +21,12 @@ export const CATEGORIES = [
   { name: 'Pintura',      icon: '🎨', img: 'https://images.unsplash.com/photo-1519520104014-df63821cb6f9?w=400&q=80' },
   { name: 'Medición',     icon: '📏', img: 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=400&q=80' },
 ]
+
+export const BRANDS = [
+  { name: 'DeWalt',         logo: '🟡', desc: 'Herramientas eléctricas de alto rendimiento', products: 24 },
+  { name: 'Makita',         logo: '🔵', desc: 'Innovación y calidad desde 1915',             products: 18 },
+  { name: 'Bosch',          logo: '🔴', desc: 'Tecnología alemana para profesionales',        products: 31 },
+  { name: 'Stanley',        logo: '🟠', desc: 'Herramientas manuales de confianza',           products: 15 },
+  { name: 'Black & Decker', logo: '⚫', desc: 'Soluciones para el hogar y profesionales',     products: 20 },
+  { name: 'Irwin',          logo: '🟢', desc: 'Herramientas de corte y sujeción',             products: 12 },
+]

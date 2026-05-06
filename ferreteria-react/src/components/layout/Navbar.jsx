@@ -47,12 +47,11 @@ function Navbar() {
         </button>
         <div className="navbar__links">
           <Link to="/promociones">Promociones</Link>
-          <a href="#">Marcas</a>
+          <Link to="/marcas">Marcas</Link>
           <a href="#">Ideas y soluciones</a>
         </div>
       </div>
 
-      {/* Mega Menu */}
       <div
         className={`mega-menu ${menuOpen ? 'open' : ''}`}
         onMouseEnter={() => setMenuOpen(true)}
