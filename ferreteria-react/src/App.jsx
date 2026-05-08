@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
+import { CartProvider } from './context/CartContext'
 import TopBar from './components/layout/TopBar'
 import Header from './components/layout/Header'
 import Navbar from './components/layout/Navbar'
@@ -20,36 +22,40 @@ import './index.css'
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Ruta admin sin header/footer */}
-        <Route path="/admin" element={<AdminPage />} />
+    <AuthProvider>
+      <CartProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Ruta admin sin header/footer */}
+            <Route path="/admin" element={<AdminPage />} />
 
-        {/* Rutas normales con header/footer */}
-        <Route path="/*" element={
-          <>
-            <PromoBanner />
-            <TopBar />
-            <Header />
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/promociones" element={<PromocionesPage />} />
-              <Route path="/marcas" element={<MarcasPage />} />
-              <Route path="/marca/:nombre" element={<MarcaPage />} />
-              <Route path="/ideas" element={<IdeasPage />} />
-              <Route path="/categoria/:nombre" element={<CategoriaPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-            <Footer />
-            <CartSidebar />
-            <WishlistSidebar />
-            <AuthModal />
-            <ToastContainer />
-          </>
-        } />
-      </Routes>
-    </BrowserRouter>
+            {/* Rutas normales con header/footer */}
+            <Route path="/*" element={
+              <>
+                <PromoBanner />
+                <TopBar />
+                <Header />
+                <Navbar />
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/promociones" element={<PromocionesPage />} />
+                  <Route path="/marcas" element={<MarcasPage />} />
+                  <Route path="/marca/:nombre" element={<MarcaPage />} />
+                  <Route path="/ideas" element={<IdeasPage />} />
+                  <Route path="/categoria/:nombre" element={<CategoriaPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+                <Footer />
+                <CartSidebar />
+                <WishlistSidebar />
+                <AuthModal />
+                <ToastContainer />
+              </>
+            } />
+          </Routes>
+        </BrowserRouter>
+      </CartProvider>
+    </AuthProvider>
   )
 }
 

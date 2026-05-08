@@ -1,116 +1,138 @@
+import { useState, useEffect } from 'react'
+import { getReporteDiario, getReporteMensual, getTopProductos } from '../../services/api'
+import { toArr } from '../../utils/parseResponse'
+
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-const VENTAS = [3200, 4100, 3800, 5200, 4800, 6100, 5500, 7200, 6800, 8100, 7500, 9200]
-const MAX_VENTA = Math.max(...VENTAS)
 
-const CATEGORIAS_VENTAS = [
-  { name: 'Herramientas', value: 42, color: '#FF6B35' },
-  { name: 'Construcción', value: 28, color: '#1565C0' },
-  { name: 'Eléctrico',    value: 15, color: '#2E7D32' },
-  { name: 'Fontanería',   value: 10, color: '#f57f17' },
-  { name: 'Pintura',      value: 5,  color: '#6a1b9a' },
-]
-
-const RESUMEN = [
-  { label: 'Ingresos totales', value: '$72,450.00', change: '+12.5%', up: true },
-  { label: 'Pedidos totales',  value: '284',        change: '+8.3%',  up: true },
-  { label: 'Ticket promedio',  value: '$255.00',    change: '+3.9%',  up: true },
-  { label: 'Devoluciones',     value: '12',         change: '-2.1%',  up: false },
-]
+function pick(obj, ...keys) {
+  for (const k of keys) if (obj?.[k] != null) return obj[k]
+  return null
+}
 
 function AdminReportes() {
+  const [diario, setDiario]     = useState(null)
+  const [mensual, setMensual]   = useState(null)
+  const [topProds, setTopProds] = useState([])
+  const [loading, setLoading]   = useState(true)
+
+  useEffect(() => {
+    Promise.all([
+      getReporteDiario().catch(() => ({ data: null })),
+      getReporteMensual().catch(() => ({ data: null })),
+      getTopProductos().catch(() => ({ data: [] })),
+    ]).then(([d, m, t]) => {
+      console.log('[Reporte diario]', d.data)
+      console.log('[Reporte mensual]', m.data)
+      console.log('[Top productos]', t.data)
+      setDiario(d.data)
+      setMensual(m.data)
+      setTopProds(toArr(t.data))
+    })
+    .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) return <p style={{ color: 'var(--subtle)' }}>Cargando reportes...</p>
+
+  const totalVentasHoy   = pick(diario, 'total_ventas', 'totalVentas', 'ingresos', 'total') ?? 0
+  const totalPedidosHoy  = pick(diario, 'total_pedidos', 'totalPedidos', 'pedidos') ?? '–'
+  const totalVentasMes   = pick(mensual, 'total_ventas', 'totalVentas', 'ingresos', 'total') ?? 0
+  const totalPedidosMes  = pick(mensual, 'total_pedidos', 'totalPedidos', 'pedidos') ?? '–'
+
+  const resumen = [
+    { label: 'Ingresos hoy',     value: `$${parseFloat(totalVentasHoy).toFixed(2)}` },
+    { label: 'Pedidos hoy',      value: totalPedidosHoy },
+    { label: 'Ingresos del mes', value: `$${parseFloat(totalVentasMes).toFixed(2)}` },
+    { label: 'Pedidos del mes',  value: totalPedidosMes },
+  ]
+
+  const ventasMensuales = toArr(pick(mensual, 'ventas_por_mes', 'ventasPorMes', 'por_mes', 'meses'))
+  const maxVenta = Math.max(...ventasMensuales.map(v => parseFloat(v.total || v.ventas || 0)), 1)
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
       {/* Resumen */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-        {RESUMEN.map((r, i) => (
-          <div key={i} style={{
-            background: '#fff', borderRadius: '12px', padding: '1.5rem',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-          }}>
+        {resumen.map((r, i) => (
+          <div key={i} style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
             <p style={{ fontSize: '0.8rem', color: 'var(--subtle)', marginBottom: '0.5rem' }}>{r.label}</p>
             <p style={{ fontSize: '1.75rem', fontFamily: 'var(--font-display)', fontWeight: 700 }}>{r.value}</p>
-            <p style={{ fontSize: '0.8rem', fontWeight: 600, marginTop: '0.35rem', color: r.up ? '#2E7D32' : '#c62828' }}>
-              {r.change} vs mes anterior
-            </p>
           </div>
         ))}
       </div>
 
-      {/* Gráfica de ventas */}
-      <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', marginBottom: '1.5rem' }}>
-          📈 Ventas mensuales 2026
-        </h3>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem', height: '200px' }}>
-          {VENTAS.map((v, i) => (
-            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem', height: '100%', justifyContent: 'flex-end' }}>
-              <span style={{ fontSize: '0.65rem', color: 'var(--subtle)', fontWeight: 600 }}>
-                ${(v/1000).toFixed(1)}k
-              </span>
-              <div style={{
-                width: '100%', background: i === 3 ? 'var(--accent)' : '#e3f2fd',
-                borderRadius: '6px 6px 0 0',
-                height: `${(v / MAX_VENTA) * 160}px`,
-                transition: '0.3s ease',
-                minHeight: '8px'
-              }} />
-              <span style={{ fontSize: '0.65rem', color: 'var(--subtle)' }}>{MESES[i]}</span>
-            </div>
-          ))}
+      {/* Gráfica de ventas mensuales */}
+      {ventasMensuales.length > 0 && (
+        <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', marginBottom: '1.5rem' }}>📈 Ventas por mes</h3>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem', height: '200px' }}>
+            {ventasMensuales.map((v, i) => {
+              const val = parseFloat(v.total || v.ventas || 0)
+              return (
+                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem', height: '100%', justifyContent: 'flex-end' }}>
+                  <span style={{ fontSize: '0.65rem', color: 'var(--subtle)', fontWeight: 600 }}>
+                    ${(val / 1000).toFixed(1)}k
+                  </span>
+                  <div style={{ width: '100%', background: '#e3f2fd', borderRadius: '6px 6px 0 0', height: `${(val / maxVenta) * 160}px`, minHeight: '4px' }} />
+                  <span style={{ fontSize: '0.65rem', color: 'var(--subtle)' }}>{MESES[i] || v.mes || i + 1}</span>
+                </div>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
 
-        {/* Ventas por categoría */}
+        {/* Top productos */}
         <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', marginBottom: '1.25rem' }}>
-            📦 Ventas por categoría
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-            {CATEGORIAS_VENTAS.map((cat, i) => (
-              <div key={i}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>{cat.name}</span>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: cat.color }}>{cat.value}%</span>
-                </div>
-                <div style={{ height: '8px', background: 'var(--secondary)', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{
-                    height: '100%', width: `${cat.value}%`,
-                    background: cat.color, borderRadius: '4px',
-                    transition: '0.3s ease'
-                  }} />
-                </div>
-              </div>
-            ))}
-          </div>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', marginBottom: '1.25rem' }}>📦 Productos más vendidos</h3>
+          {topProds.length === 0 ? (
+            <p style={{ color: 'var(--subtle)', fontSize: '0.875rem' }}>Sin datos</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+              {topProds.slice(0, 5).map((p, i) => {
+                const nombre   = p.nombre || p.name || '–'
+                const vendidos = pick(p, 'total_vendido', 'totalVendido', 'cantidad', 'sold') ?? 0
+                const precio   = pick(p, 'precio_venta', 'precioVenta', 'precio', 'price') ?? 0
+                return (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: i === 0 ? '#FFD700' : i === 1 ? '#C0C0C0' : i === 2 ? '#CD7F32' : 'var(--secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0, color: i < 3 ? '#fff' : 'var(--subtle)' }}>{i + 1}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{nombre}</p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--subtle)' }}>{vendidos} vendidos</p>
+                    </div>
+                    <p style={{ fontSize: '0.875rem', fontWeight: 700, flexShrink: 0 }}>${parseFloat(precio).toFixed(2)}</p>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Tabla resumen mensual */}
+        {/* Detalle diario */}
         <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', marginBottom: '1.25rem' }}>
-            📅 Resumen por mes
-          </h3>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid var(--border)' }}>
-                {['Mes', 'Ventas', 'Pedidos', 'Promedio'].map(h => (
-                  <th key={h} style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.75rem', color: 'var(--subtle)', fontWeight: 600 }}>{h}</th>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', marginBottom: '1.25rem' }}>📅 Reporte de hoy</h3>
+          {diario ? (
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <tbody>
+                {Object.entries(diario).filter(([, v]) => typeof v !== 'object').map(([k, v], i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '0.6rem 0.5rem', fontSize: '0.8rem', color: 'var(--subtle)', textTransform: 'capitalize' }}>
+                      {k.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1')}
+                    </td>
+                    <td style={{ padding: '0.6rem 0.5rem', fontSize: '0.8rem', fontWeight: 700, textAlign: 'right' }}>
+                      {typeof v === 'number'
+                        ? (k.toLowerCase().includes('venta') || k.toLowerCase().includes('ingreso') || k.toLowerCase().includes('total') ? `$${v.toFixed(2)}` : v)
+                        : String(v)}
+                    </td>
+                  </tr>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
-              {MESES.slice(0, 6).map((mes, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '0.6rem 0.5rem', fontSize: '0.8rem', fontWeight: 500 }}>{mes}</td>
-                  <td style={{ padding: '0.6rem 0.5rem', fontSize: '0.8rem', fontWeight: 700 }}>${VENTAS[i].toLocaleString()}</td>
-                  <td style={{ padding: '0.6rem 0.5rem', fontSize: '0.8rem' }}>{Math.round(VENTAS[i] / 255)}</td>
-                  <td style={{ padding: '0.6rem 0.5rem', fontSize: '0.8rem', color: 'var(--subtle)' }}>$255</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          ) : (
+            <p style={{ color: 'var(--subtle)', fontSize: '0.875rem' }}>Sin datos</p>
+          )}
         </div>
       </div>
     </div>
