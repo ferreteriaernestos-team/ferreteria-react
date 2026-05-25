@@ -1,6 +1,11 @@
 import { Link } from 'react-router-dom'
 
-function Breadcrumb({ current }) {
+/**
+ * Breadcrumb({ current, items })
+ * items = [{ label: 'Marcas', path: '/marcas' }, ...]   (optional intermediate crumbs)
+ * current = last (non-clickable) label
+ */
+function Breadcrumb({ current, items = [] }) {
   return (
     <div className="breadcrumb">
       <div className="container">
@@ -14,6 +19,16 @@ function Breadcrumb({ current }) {
               Inicio
             </Link>
           </li>
+          {items.map((item, i) => (
+            <span key={i} style={{ display: 'contents' }}>
+              <li className="breadcrumb__sep">›</li>
+              <li>
+                <Link to={item.path} className="breadcrumb__home" style={{ color: 'var(--subtle)' }}>
+                  {item.label}
+                </Link>
+              </li>
+            </span>
+          ))}
           <li className="breadcrumb__sep">›</li>
           <li><span className="breadcrumb__current">{current}</span></li>
         </ol>

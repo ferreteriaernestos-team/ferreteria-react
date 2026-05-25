@@ -20,24 +20,30 @@ function AdminReportes() {
     Promise.all([
       getReporteDiario().catch(() => ({ data: null })),
       getReporteMensual().catch(() => ({ data: null })),
-      getTopProductos().catch(() => ({ data: [] })),
+      getTopProductos().catch(() => ({ data: null })),
     ]).then(([d, m, t]) => {
-      console.log('[Reporte diario]', d.data)
-      console.log('[Reporte mensual]', m.data)
-      console.log('[Top productos]', t.data)
-      setDiario(d.data)
-      setMensual(m.data)
-      setTopProds(toArr(t.data))
+      // Backend response: { success, data: { ... }, timestamp }
+      // Axios wraps in .data, so d.data = { success, data: {...}, timestamp }
+      // We need d.data.data to get the actual payload
+      const diarioData  = d.data?.data  ?? d.data  ?? null
+      const mensualData = m.data?.data  ?? m.data  ?? null
+      const topData     = t.data?.data  ?? t.data  ?? null
+      setDiario(diarioData)
+      setMensual(mensualData)
+      // Backend top-productos: { productos: [...] }
+      setTopProds(toArr(topData))
     })
     .finally(() => setLoading(false))
   }, [])
 
   if (loading) return <p style={{ color: 'var(--subtle)' }}>Cargando reportes...</p>
 
-  const totalVentasHoy   = pick(diario, 'total_ventas', 'totalVentas', 'ingresos', 'total') ?? 0
-  const totalPedidosHoy  = pick(diario, 'total_pedidos', 'totalPedidos', 'pedidos') ?? '–'
-  const totalVentasMes   = pick(mensual, 'total_ventas', 'totalVentas', 'ingresos', 'total') ?? 0
-  const totalPedidosMes  = pick(mensual, 'total_pedidos', 'totalPedidos', 'pedidos') ?? '–'
+  // diario → { totalVentas (ingresos), cantidadVentas (count), productosVendidos }
+  // mensual → { totalVentas (count), totalIngresos (ingresos) }
+  const totalVentasHoy   = pick(diario, 'totalVentas', 'total_ventas', 'ingresos', 'total') ?? 0
+  const totalPedidosHoy  = pick(diario, 'cantidadVentas', 'total_pedidos', 'totalPedidos', 'pedidos') ?? '–'
+  const totalVentasMes   = pick(mensual, 'totalIngresos', 'total_ingresos', 'total_ventas', 'totalVentas', 'ingresos') ?? 0
+  const totalPedidosMes  = pick(mensual, 'totalVentas', 'total_pedidos', 'totalPedidos', 'pedidos') ?? '–'
 
   const resumen = [
     { label: 'Ingresos hoy',     value: `$${parseFloat(totalVentasHoy).toFixed(2)}` },
@@ -46,7 +52,8 @@ function AdminReportes() {
     { label: 'Pedidos del mes',  value: totalPedidosMes },
   ]
 
-  const ventasMensuales = toArr(pick(mensual, 'ventas_por_mes', 'ventasPorMes', 'por_mes', 'meses'))
+  // El backend /reportes/mensual devuelve { totalVentas, totalIngresos } — no hay array por mes aún
+  const ventasMensuales = toArr(pick(mensual, 'ventas_por_mes', 'ventasPorMes', 'por_mes', 'meses', 'ventas'))
   const maxVenta = Math.max(...ventasMensuales.map(v => parseFloat(v.total || v.ventas || 0)), 1)
 
   return (
@@ -93,17 +100,16 @@ function AdminReportes() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
               {topProds.slice(0, 5).map((p, i) => {
-                const nombre   = p.nombre || p.name || '–'
-                const vendidos = pick(p, 'total_vendido', 'totalVendido', 'cantidad', 'sold') ?? 0
-                const precio   = pick(p, 'precio_venta', 'precioVenta', 'precio', 'price') ?? 0
+                // Backend returns: { producto: "nombre", ventas: N }
+                const nombre   = p.producto || p.nombre || p.name || '–'
+                const vendidos = p.ventas ?? pick(p, 'total_vendido', 'totalVendido', 'cantidad', 'sold') ?? 0
                 return (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: i === 0 ? '#FFD700' : i === 1 ? '#C0C0C0' : i === 2 ? '#CD7F32' : 'var(--secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0, color: i < 3 ? '#fff' : 'var(--subtle)' }}>{i + 1}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{nombre}</p>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--subtle)' }}>{vendidos} vendidos</p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--subtle)' }}>{vendidos} unidades vendidas</p>
                     </div>
-                    <p style={{ fontSize: '0.875rem', fontWeight: 700, flexShrink: 0 }}>${parseFloat(precio).toFixed(2)}</p>
                   </div>
                 )
               })}
@@ -117,22 +123,24 @@ function AdminReportes() {
           {diario ? (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <tbody>
-                {Object.entries(diario).filter(([, v]) => typeof v !== 'object').map(([k, v], i) => (
+                {[
+                  { key: 'totalVentas',    label: 'Ingresos del día',    format: v => `$${Number(v).toFixed(2)}` },
+                  { key: 'cantidadVentas', label: 'Ventas realizadas',   format: v => `${v} venta${v !== 1 ? 's' : ''}` },
+                  { key: 'totalIngresos',  label: 'Ingresos del mes',    format: v => `$${Number(v).toFixed(2)}` },
+                ]
+                  .filter(row => diario[row.key] != null)
+                  .map((row, i) => (
                   <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '0.6rem 0.5rem', fontSize: '0.8rem', color: 'var(--subtle)', textTransform: 'capitalize' }}>
-                      {k.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1')}
-                    </td>
-                    <td style={{ padding: '0.6rem 0.5rem', fontSize: '0.8rem', fontWeight: 700, textAlign: 'right' }}>
-                      {typeof v === 'number'
-                        ? (k.toLowerCase().includes('venta') || k.toLowerCase().includes('ingreso') || k.toLowerCase().includes('total') ? `$${v.toFixed(2)}` : v)
-                        : String(v)}
+                    <td style={{ padding: '0.6rem 0.5rem', fontSize: '0.8rem', color: 'var(--subtle)' }}>{row.label}</td>
+                    <td style={{ padding: '0.6rem 0.5rem', fontSize: '0.875rem', fontWeight: 700, textAlign: 'right', color: 'var(--text)' }}>
+                      {row.format(diario[row.key])}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
-            <p style={{ color: 'var(--subtle)', fontSize: '0.875rem' }}>Sin datos</p>
+            <p style={{ color: 'var(--subtle)', fontSize: '0.875rem' }}>Sin datos para hoy</p>
           )}
         </div>
       </div>

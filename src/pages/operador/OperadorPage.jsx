@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import OperadorLayout from '../../components/operador/OperadorLayout'
 import OperadorDashboard from '../../components/operador/OperadorDashboard'
-import AdminCaja from '../../components/admin/AdminCaja'
+import OperadorCaja from '../../components/operador/OperadorCaja'
 import AdminVentas from '../../components/admin/AdminVentas'
 import AdminClientes from '../../components/admin/AdminClientes'
 import AdminPedidos from '../../components/admin/AdminPedidos'
@@ -12,13 +12,13 @@ function OperadorPage() {
 
   function renderSection() {
     switch (activeSection) {
-      case 'dashboard': return <OperadorDashboard />
-      case 'caja':      return <AdminCaja />
+      case 'dashboard': return <OperadorDashboard onSectionChange={setActiveSection} />
+      case 'caja':      return <OperadorCaja />
       case 'ventas':    return <AdminVentas />
       case 'clientes':  return <AdminClientes />
       case 'productos': return <ProductosView />
       case 'pedidos':   return <AdminPedidos />
-      default:          return <OperadorDashboard />
+      default:          return <OperadorDashboard onSectionChange={setActiveSection} />
     }
   }
 

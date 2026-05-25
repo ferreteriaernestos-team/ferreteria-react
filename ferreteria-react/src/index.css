@@ -4,6 +4,23 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap');
 
+/* ============================================
+   Accesibilidad base
+   ============================================ */
+:focus-visible {
+  outline: 3px solid rgba(255, 107, 53, 0.9);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-radius: 10px;
+}
+
+
 /* ─── Variables ─────────────────────────── */
 :root {
   --bg: #ffffff;
@@ -11,8 +28,9 @@
   --card: #ffffff;
   --secondary: #F5F5F5;
   --muted: #E0E0E0;
-  --muted-fg: #424242;
-  --subtle: #717182;
+  --muted-fg: #2F2F2F;
+  --subtle: #5B5B6B;
+
   --accent: #FF6B35;
   --accent-dark: #E55A2B;
   --border: #E0E0E0;

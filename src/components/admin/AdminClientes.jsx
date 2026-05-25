@@ -106,6 +106,9 @@ function AdminClientes() {
   const [historialCliente, setHistorialCliente] = useState(null)
   const [historialData, setHistorialData]       = useState([])
   const [historialLoading, setHistorialLoading] = useState(false)
+  const [historialPage, setHistorialPage]       = useState(1)
+  const [pedidoDetalle, setPedidoDetalle]       = useState(null) // sub-modal detalle
+  const HISTORIAL_LIMIT = 6
 
   const limit = 10
 
@@ -146,6 +149,8 @@ function AdminClientes() {
   async function handleVerHistorial(cliente) {
     setHistorialCliente(cliente)
     setHistorialData([])
+    setHistorialPage(1)
+    setPedidoDetalle(null)
     setHistorialLoading(true)
     try {
       const r = await getPedidos({ cliente_id: cliente.id, limit: 100 })
@@ -178,6 +183,10 @@ function AdminClientes() {
     total: acc.total + Number(p.total || 0),
     entregados: acc.entregados + (p.estado === 'ENTREGADO' ? 1 : 0),
   }), { total: 0, entregados: 0 })
+
+  // Paginación cliente-side del historial
+  const historialTotalPages = Math.max(1, Math.ceil(historialData.length / HISTORIAL_LIMIT))
+  const historialPaged = historialData.slice((historialPage - 1) * HISTORIAL_LIMIT, historialPage * HISTORIAL_LIMIT)
 
   return (
     <div>
@@ -352,30 +361,179 @@ function AdminClientes() {
             </div>
           )}
 
-          {/* Lista de pedidos */}
-          <div style={{ maxHeight: '420px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingRight: '2px' }}>
-            {historialLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} style={{ height: '80px', background: '#f0f0f0', borderRadius: '10px', animation: 'pulse 1.4s ease-in-out infinite' }} />
-              ))
-            ) : historialData.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-                <div style={{ marginBottom: '0.75rem', color: '#ccc' }}>
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                    <line x1="3" y1="6" x2="21" y2="6"/>
-                    <path d="M16 10a4 4 0 0 1-8 0"/>
-                  </svg>
-                </div>
-                <p style={{ fontSize: '0.9rem', fontWeight: 600, color: '#888' }}>Sin compras registradas</p>
-                <p style={{ fontSize: '0.8rem', color: '#aaa', marginTop: '0.25rem' }}>Este cliente aún no ha realizado pedidos</p>
+          {/* Lista de pedidos paginada */}
+          {historialLoading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} style={{ height: '56px', background: '#f3f4f6', borderRadius: '8px' }} />
+              ))}
+            </div>
+          ) : historialData.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2.5rem 1rem' }}>
+              <div style={{ marginBottom: '0.75rem', color: '#d1d5db' }}>
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto', display: 'block' }}>
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
               </div>
-            ) : (
-              historialData.map(pedido => (
-                <PedidoCard key={pedido.id} pedido={pedido} />
-              ))
-            )}
+              <p style={{ fontSize: '0.9rem', fontWeight: 600, color: '#6b7280', margin: 0 }}>Sin compras registradas</p>
+              <p style={{ fontSize: '0.78rem', color: '#9ca3af', margin: '0.3rem 0 0' }}>Este cliente aún no ha realizado pedidos</p>
+            </div>
+          ) : (
+            <>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #f3f4f6' }}>
+                      {['Pedido', 'Fecha', 'Estado', 'Total', ''].map(h => (
+                        <th key={h} style={{ padding: '0.5rem 0.75rem', textAlign: 'left', fontSize: '0.72rem', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historialPaged.map(pedido => (
+                      <tr key={pedido.id} style={{ borderBottom: '1px solid #f9fafb' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#fafafa' }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+                      >
+                        <td style={{ padding: '0.75rem', fontSize: '0.85rem', fontWeight: 700, color: '#374151' }}>#{pedido.id}</td>
+                        <td style={{ padding: '0.75rem', fontSize: '0.78rem', color: '#6b7280', whiteSpace: 'nowrap' }}>{formatDate(pedido.created_at)}</td>
+                        <td style={{ padding: '0.75rem' }}><StatusBadge estado={pedido.estado} /></td>
+                        <td style={{ padding: '0.75rem', fontSize: '0.9rem', fontWeight: 700, color: 'var(--accent)' }}>
+                          ${Number(pedido.total || 0).toFixed(2)}
+                        </td>
+                        <td style={{ padding: '0.75rem' }}>
+                          <button
+                            onClick={() => setPedidoDetalle(pedido)}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: '0.3rem',
+                              padding: '0.35rem 0.75rem', borderRadius: '6px',
+                              fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer',
+                              background: 'transparent',
+                              border: '1.5px solid var(--accent)', color: 'var(--accent)',
+                              transition: 'background 0.15s, color 0.15s',
+                              whiteSpace: 'nowrap',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.color = '#fff' }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--accent)' }}
+                          >
+                            <IconHistory /> Ver detalles
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Paginación historial */}
+              {historialTotalPages > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', paddingTop: '1rem', borderTop: '1px solid #f3f4f6', marginTop: '0.75rem' }}>
+                  <button
+                    onClick={() => setHistorialPage(p => Math.max(1, p - 1))}
+                    disabled={historialPage === 1}
+                    style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', border: '1.5px solid #e5e7eb', background: historialPage === 1 ? '#f9fafb' : '#fff', color: historialPage === 1 ? '#d1d5db' : '#374151', cursor: historialPage === 1 ? 'not-allowed' : 'pointer', fontSize: '0.8rem', fontWeight: 600 }}
+                  >
+                    ← Ant.
+                  </button>
+                  <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                    Pág. {historialPage} de {historialTotalPages}
+                  </span>
+                  <button
+                    onClick={() => setHistorialPage(p => Math.min(historialTotalPages, p + 1))}
+                    disabled={historialPage === historialTotalPages}
+                    style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', border: '1.5px solid #e5e7eb', background: historialPage === historialTotalPages ? '#f9fafb' : '#fff', color: historialPage === historialTotalPages ? '#d1d5db' : '#374151', cursor: historialPage === historialTotalPages ? 'not-allowed' : 'pointer', fontSize: '0.8rem', fontWeight: 600 }}
+                  >
+                    Sig. →
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </Modal>
+      )}
+
+      {/* ── Sub-modal: Detalle de pedido ── */}
+      {pedidoDetalle && (
+        <Modal onClose={() => setPedidoDetalle(null)} maxWidth="560px">
+          {/* Cabecera */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+            <div>
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
+                Pedido #{pedidoDetalle.id}
+              </h3>
+              <p style={{ fontSize: '0.78rem', color: '#9ca3af', margin: '0.2rem 0 0' }}>{formatDate(pedidoDetalle.created_at)}</p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent)' }}>
+                ${Number(pedidoDetalle.total || 0).toFixed(2)}
+              </span>
+              <StatusBadge estado={pedidoDetalle.estado} />
+            </div>
           </div>
+
+          {/* Productos */}
+          <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 0.6rem' }}>Productos</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '1rem' }}>
+            {(pedidoDetalle.detalle_pedido || []).length === 0
+              ? <p style={{ fontSize: '0.82rem', color: '#9ca3af' }}>Sin detalles disponibles</p>
+              : (pedidoDetalle.detalle_pedido || []).map((d, i) => {
+                  const prod = d.productos || d
+                  return (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.875rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
+                      {prod.imagen
+                        ? <img src={prod.imagen} alt={prod.nombre} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} />
+                        : <div style={{ width: '40px', height: '40px', background: '#f3f4f6', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><IconPackage /></div>
+                      }
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: '0.85rem', fontWeight: 600, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#111827' }}>
+                          {prod.nombre || '–'}
+                        </p>
+                        <p style={{ fontSize: '0.75rem', color: '#9ca3af', margin: '0.1rem 0 0' }}>
+                          ${Number(d.precio_unitario || 0).toFixed(2)} c/u × {d.cantidad}
+                        </p>
+                      </div>
+                      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--accent)', flexShrink: 0 }}>
+                        ${Number(d.subtotal || 0).toFixed(2)}
+                      </span>
+                    </div>
+                  )
+                })
+            }
+          </div>
+
+          {/* Dirección */}
+          {pedidoDetalle.direccion_entrega && (
+            <div style={{ background: '#f8fafc', borderRadius: '8px', padding: '0.65rem 0.875rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.82rem', color: '#6b7280' }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '0.1rem' }}>
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+              {pedidoDetalle.direccion_entrega}
+            </div>
+          )}
+
+          {/* Observaciones */}
+          {pedidoDetalle.observaciones && (
+            <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '8px', padding: '0.65rem 0.875rem', fontSize: '0.82rem', color: '#92400e' }}>
+              <strong>Nota:</strong> {pedidoDetalle.observaciones}
+            </div>
+          )}
+
+          {/* Resumen total */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem', paddingTop: '1rem', borderTop: '2px solid #f3f4f6' }}>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ fontSize: '0.78rem', color: '#9ca3af', margin: 0 }}>Total del pedido</p>
+              <p style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--accent)', margin: '0.1rem 0 0', fontFamily: 'var(--font-display)' }}>
+                ${Number(pedidoDetalle.total || 0).toFixed(2)}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setPedidoDetalle(null)}
+            style={{ width: '100%', marginTop: '1rem', padding: '0.7rem', border: '1.5px solid #e5e7eb', borderRadius: '8px', background: '#fff', fontWeight: 600, cursor: 'pointer', color: '#374151', fontSize: '0.875rem' }}
+          >
+            Cerrar
+          </button>
         </Modal>
       )}
     </div>
@@ -402,87 +560,6 @@ function ActionBtn({ onClick, color, bg, hoverBg, title, icon, label }) {
       }}>
       {icon}{label}
     </button>
-  )
-}
-
-// ── Pedido card (dentro del historial) ────────────────────────────────────────
-function PedidoCard({ pedido }) {
-  const [open, setOpen] = useState(false)
-  const detalles = pedido.detalle_pedido || []
-
-  return (
-    <div style={{ background: '#fff', border: '1.5px solid var(--border)', borderRadius: '10px', overflow: 'hidden' }}>
-      {/* Cabecera del pedido */}
-      <button
-        onClick={() => setOpen(o => !o)}
-        style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '0.875rem 1rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--fg)' }}>
-              Pedido #{pedido.id}
-            </span>
-            <StatusBadge estado={pedido.estado} />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--subtle)' }}>{formatDate(pedido.created_at)}</span>
-            <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--accent)' }}>${Number(pedido.total).toFixed(2)}</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
-              style={{ transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', color: 'var(--subtle)', flexShrink: 0 }}>
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
-          </div>
-        </div>
-        {pedido.direccion_entrega && (
-          <p style={{ fontSize: '0.77rem', color: 'var(--subtle)', margin: '0.3rem 0 0', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-            </svg>
-            {pedido.direccion_entrega}
-          </p>
-        )}
-      </button>
-
-      {/* Detalles expandibles */}
-      {open && (
-        <div style={{ borderTop: '1px solid var(--border)', padding: '0.75rem 1rem', background: '#fafbfc' }}>
-          {detalles.length === 0 ? (
-            <p style={{ fontSize: '0.8rem', color: 'var(--subtle)' }}>Sin detalles disponibles</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {detalles.map((d, i) => {
-                const prod = d.productos || d
-                return (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.6rem', background: '#fff', borderRadius: '7px', border: '1px solid var(--border)' }}>
-                    {prod.imagen
-                      ? <img src={prod.imagen} alt={prod.nombre} style={{ width: '38px', height: '38px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} />
-                      : <div style={{ width: '38px', height: '38px', background: '#f0f0f0', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#bbb' }}>
-                          <IconPackage />
-                        </div>
-                    }
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: '0.82rem', fontWeight: 600, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {prod.nombre || '–'}
-                      </p>
-                      <p style={{ fontSize: '0.76rem', color: 'var(--subtle)', margin: '0.1rem 0 0' }}>
-                        ${Number(d.precio_unitario).toFixed(2)} c/u · cantidad: {d.cantidad}
-                      </p>
-                    </div>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent)', flexShrink: 0 }}>
-                      ${Number(d.subtotal).toFixed(2)}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-          {pedido.observaciones && (
-            <p style={{ fontSize: '0.77rem', color: 'var(--subtle)', marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid var(--border)' }}>
-              Nota: {pedido.observaciones}
-            </p>
-          )}
-        </div>
-      )}
-    </div>
   )
 }
 

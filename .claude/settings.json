@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "statusMessage": "Revisando si hay bugs para documentar...",
+            "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"Stop\", \"additionalContext\": \"RECORDATORIO AUTOMÁTICO (no ignorar): Antes de terminar esta sesión, revisa si encontraste algún bug, patrón de error, o antipatrón que le costara tiempo resolver. Si es así, agrégalo como nueva entrada en .claude/COMMON_MISTAKES.md con el formato: ### N. Descripción / **Síntoma**: / **Fix**: Hazlo ahora si aplica, de lo contrario ignora este recordatorio silenciosamente.\"}}'",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

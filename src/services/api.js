@@ -137,6 +137,11 @@ export const getHistorialCaja  = ()       => api.get('/caja/historial')
 export const abrirCaja         = (data)   => api.post('/caja/abrir', data)
 export const cerrarCaja        = (data)   => api.put('/caja/cerrar', data)
 
+// ── WhatsApp ──────────────────────────────────────────────────────────────────
+export const getWhatsAppQr       = ()     => api.get('/whatsapp/qr')
+export const getWhatsAppStatus   = ()     => api.get('/whatsapp/status')
+export const regenerateWhatsAppQr= ()     => api.post('/whatsapp/qr/regenerar')
+
 // ── Reportes ──────────────────────────────────────────────────────────────────
 export const getReporteCaja    = (id)     => api.get(`/reportes/caja/${id}`)
 export const getReporteDiario  = ()       => api.get('/reportes/diario')

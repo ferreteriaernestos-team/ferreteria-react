@@ -41,7 +41,9 @@ export const CheckCircle  = base(<><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/
 export const MapPin       = base(<><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></>)
 export const FileText     = base(<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></>)
 export const Inbox        = base(<><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></>)
-export const Wrench       = base(<><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></>)
+export const Wrench         = base(<><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></>)
+export const MessageCircle  = base(<><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></>)
+export const Hash           = base(<><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></>)
 
 // Convenience default export
 const Icons = {
@@ -49,6 +51,6 @@ const Icons = {
   ClipboardList, AlertTriangle, RefreshCw, Percent, TrendingUp, Home, LogOut,
   Edit, Trash2, Clock, Search, X, Plus, Upload, Lock, Unlock,
   ChevronDown, ChevronLeft, ChevronRight, User, CheckCircle, MapPin,
-  FileText, Inbox, Wrench,
+  FileText, Inbox, Wrench, MessageCircle, Hash,
 }
 export default Icons

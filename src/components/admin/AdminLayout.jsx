@@ -17,6 +17,7 @@ const navItems = [
   { id: 'movimientos',    label: 'Movimientos',      Icon: Icons.RefreshCw },
   { id: 'descuentos',     label: 'Descuentos',       Icon: Icons.Percent },
   { id: 'reportes',       label: 'Reportes',         Icon: Icons.TrendingUp },
+  { id: 'whatsapp',      label: 'WhatsApp (QR)',   Icon: Icons.Inbox },
 ]
 
 function AdminLayout({ children, activeSection, onSectionChange }) {
@@ -60,7 +61,7 @@ function AdminLayout({ children, activeSection, onSectionChange }) {
           }}>
             {collapsed
               ? <Icons.ChevronRight size={15} />
-              : <Icons.ChevronLeft  size={15} />
+              : <Icons.ChevronLeft size={15} />
             }
           </button>
         </div>
@@ -86,11 +87,23 @@ function AdminLayout({ children, activeSection, onSectionChange }) {
                   textAlign: 'left',
                   justifyContent: collapsed ? 'center' : 'flex-start',
                 }}
-                onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#fff' } }}
-                onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9ca3af' } }}
+                onMouseEnter={e => {
+                  if (!active) {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                    e.currentTarget.style.color = '#fff'
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!active) {
+                    e.currentTarget.style.background = 'transparent'
+                    e.currentTarget.style.color = '#9ca3af'
+                  }
+                }}
               >
                 <item.Icon size={17} />
-                {!collapsed && <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</span>}
+                {!collapsed && (
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</span>
+                )}
               </button>
             )
           })}
@@ -109,8 +122,14 @@ function AdminLayout({ children, activeSection, onSectionChange }) {
               fontSize: '0.8rem', justifyContent: collapsed ? 'center' : 'flex-start',
               transition: 'background 0.15s, color 0.15s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff' }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#9ca3af' }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
+              e.currentTarget.style.color = '#fff'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+              e.currentTarget.style.color = '#9ca3af'
+            }}
           >
             <Icons.Home size={16} />
             {!collapsed && <span>Ir a la tienda</span>}
@@ -174,3 +193,4 @@ function AdminLayout({ children, activeSection, onSectionChange }) {
 }
 
 export default AdminLayout
+

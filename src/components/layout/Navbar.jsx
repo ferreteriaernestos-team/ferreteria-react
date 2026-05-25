@@ -48,7 +48,7 @@ function Navbar() {
                 <h3>{dept.icon} {dept.name}</h3>
                 <ul>
                   {dept.items.map((item, j) => (
-                    <li key={j}><a href="#">{item}</a></li>
+                    <li key={j}><button type="button" onClick={() => {}}>{item}</button></li>
                   ))}
                 </ul>
               </div>

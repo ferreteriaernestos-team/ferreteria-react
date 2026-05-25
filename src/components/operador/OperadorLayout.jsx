@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import * as Icons from '../admin/shared/Icons'
 
 const navItems = [
-  { id: 'dashboard', label: 'Mi turno',    icon: '🏠' },
-  { id: 'caja',      label: 'Caja',         icon: '💰' },
-  { id: 'ventas',    label: 'Ventas',        icon: '💵' },
-  { id: 'clientes',  label: 'Clientes',      icon: '👥' },
-  { id: 'productos', label: 'Productos',     icon: '📦' },
-  { id: 'pedidos',   label: 'Pedidos',       icon: '🛒' },
+  { id: 'dashboard', label: 'Mi turno',    Icon: Icons.BarChart2 },
+  { id: 'caja',      label: 'Mi caja',     Icon: Icons.Wallet },
+  { id: 'ventas',    label: 'Ventas',      Icon: Icons.DollarSign },
+  { id: 'pedidos',   label: 'Pedidos',     Icon: Icons.ShoppingCart },
+  { id: 'clientes',  label: 'Clientes',    Icon: Icons.Users },
+  { id: 'productos', label: 'Productos',   Icon: Icons.Package },
 ]
 
 function OperadorLayout({ children, activeSection, onSectionChange }) {
@@ -16,117 +17,162 @@ function OperadorLayout({ children, activeSection, onSectionChange }) {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
 
-  function handleLogout() {
-    logout()
-    navigate('/')
-  }
+  function handleLogout() { logout(); navigate('/') }
 
   const activeItem = navItems.find(i => i.id === activeSection)
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f0f2f5' }}>
-      {/* Sidebar */}
+
+      {/* ── Sidebar ── */}
       <aside style={{
-        width: collapsed ? '70px' : '240px',
-        background: '#0f3460', color: '#fff',
+        width: collapsed ? '64px' : '256px',
+        background: '#1a1a2e', color: '#fff',
         display: 'flex', flexDirection: 'column',
-        transition: '0.3s ease', flexShrink: 0,
-        position: 'sticky', top: 0, height: '100vh', overflowY: 'auto',
+        transition: 'width 0.25s ease', flexShrink: 0,
+        position: 'sticky', top: 0, height: '100vh',
+        overflowY: 'auto', overflowX: 'hidden',
       }}>
+
         {/* Logo */}
         <div style={{
-          padding: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.1)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
+          padding: '1.25rem',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          flexShrink: 0, minHeight: '64px',
         }}>
           {!collapsed && (
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.95rem', fontWeight: 700 }}>
-              Ferretería <span style={{ color: '#e94560' }}>Operador</span>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.95rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              Ferretería <span style={{ color: 'var(--accent)' }}>Operador</span>
             </div>
           )}
-          <button onClick={() => setCollapsed(!collapsed)} style={{
-            color: '#fff', background: 'rgba(255,255,255,0.1)',
-            border: 'none', borderRadius: '6px', width: '32px', height: '32px',
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1rem', flexShrink: 0,
-          }}>
-            {collapsed ? '→' : '←'}
+          <button
+            onClick={() => setCollapsed(c => !c)}
+            style={{
+              color: '#aaa', background: 'rgba(255,255,255,0.07)',
+              border: 'none', borderRadius: '6px',
+              width: '30px', height: '30px',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0, transition: 'background 0.2s',
+            }}
+          >
+            {collapsed ? <Icons.ChevronRight size={15} /> : <Icons.ChevronLeft size={15} />}
           </button>
         </div>
 
         {/* Nav */}
-        <nav style={{ flex: 1, padding: '0.75rem 0' }}>
-          {navItems.map(item => (
-            <button key={item.id} onClick={() => onSectionChange(item.id)}
-              title={collapsed ? item.label : ''}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center',
-                gap: '0.75rem', padding: '0.75rem 1.25rem',
-                background: activeSection === item.id ? 'rgba(233,69,96,0.2)' : 'transparent',
-                borderLeft: activeSection === item.id ? '3px solid #e94560' : '3px solid transparent',
-                color: activeSection === item.id ? '#e94560' : '#ccc',
-                border: 'none', cursor: 'pointer', fontSize: '0.875rem',
-                fontWeight: activeSection === item.id ? 600 : 400,
-                transition: '0.2s ease', textAlign: 'left',
-                justifyContent: collapsed ? 'center' : 'flex-start',
-              }}
-            >
-              <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{item.icon}</span>
-              {!collapsed && <span>{item.label}</span>}
-            </button>
-          ))}
+        <nav style={{ flex: 1, padding: '0.5rem 0' }}>
+          {navItems.map(item => {
+            const active = activeSection === item.id
+            return (
+              <button
+                key={item.id}
+                onClick={() => onSectionChange(item.id)}
+                title={collapsed ? item.label : ''}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: collapsed ? '0.75rem' : '0.75rem 1.25rem',
+                  background: active ? 'rgba(255,107,53,0.15)' : 'transparent',
+                  borderLeft: active ? '3px solid var(--accent)' : '3px solid transparent',
+                  color: active ? 'var(--accent)' : '#9ca3af',
+                  border: 'none', cursor: 'pointer',
+                  fontSize: '0.845rem', fontWeight: active ? 600 : 400,
+                  transition: 'background 0.15s, color 0.15s',
+                  textAlign: 'left',
+                  justifyContent: collapsed ? 'center' : 'flex-start',
+                }}
+                onMouseEnter={e => {
+                  if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#fff' }
+                }}
+                onMouseLeave={e => {
+                  if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9ca3af' }
+                }}
+              >
+                <item.Icon size={17} />
+                {!collapsed && (
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {item.label}
+                  </span>
+                )}
+              </button>
+            )
+          })}
         </nav>
 
         {/* Footer */}
-        <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <button onClick={() => navigate('/')} style={{
-            width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem',
-            padding: '0.65rem', background: 'rgba(255,255,255,0.05)', border: 'none',
-            borderRadius: '8px', color: '#ccc', cursor: 'pointer', fontSize: '0.8rem',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-          }}>
-            <span>🏬</span>
+        <div style={{ padding: '0.875rem', borderTop: '1px solid rgba(255,255,255,0.08)', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <button
+            onClick={() => navigate('/')}
+            title={collapsed ? 'Ir a la tienda' : ''}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center',
+              gap: '0.75rem', padding: '0.6rem',
+              background: 'rgba(255,255,255,0.05)', border: 'none',
+              borderRadius: '8px', color: '#9ca3af', cursor: 'pointer',
+              fontSize: '0.8rem', justifyContent: collapsed ? 'center' : 'flex-start',
+              transition: 'background 0.15s, color 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#9ca3af' }}
+          >
+            <Icons.Home size={16} />
             {!collapsed && <span>Ir a la tienda</span>}
           </button>
-          <button onClick={handleLogout} style={{
-            width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem',
-            padding: '0.65rem', background: 'rgba(233,69,96,0.15)', border: 'none',
-            borderRadius: '8px', color: '#e94560', cursor: 'pointer', fontSize: '0.8rem',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-          }}>
-            <span>🚪</span>
+          <button
+            onClick={handleLogout}
+            title={collapsed ? 'Cerrar sesión' : ''}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center',
+              gap: '0.75rem', padding: '0.6rem',
+              background: 'rgba(198,40,40,0.12)', border: 'none',
+              borderRadius: '8px', color: '#f87171', cursor: 'pointer',
+              fontSize: '0.8rem', justifyContent: collapsed ? 'center' : 'flex-start',
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(198,40,40,0.25)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(198,40,40,0.12)' }}
+          >
+            <Icons.LogOut size={16} />
             {!collapsed && <span>Cerrar sesión</span>}
           </button>
         </div>
       </aside>
 
-      {/* Main */}
+      {/* ── Main ── */}
       <main style={{ flex: 1, overflow: 'auto' }}>
         {/* Topbar */}
         <div style={{
-          background: '#fff', padding: '1rem 2rem',
+          background: '#fff', padding: '0.875rem 2rem',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.08)', position: 'sticky', top: 0, zIndex: 10,
+          boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+          position: 'sticky', top: 0, zIndex: 10,
         }}>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', fontWeight: 700 }}>
-            {activeItem?.icon} {activeItem?.label}
-          </h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span style={{ fontSize: '0.875rem', color: 'var(--subtle)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            {activeItem && <activeItem.Icon size={20} color="var(--accent)" />}
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', fontWeight: 700, margin: 0 }}>
+              {activeItem?.label || 'Panel Operador'}
+            </h1>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+            <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>
               {user?.nombre || user?.email || 'Operador'}
             </span>
             <div style={{
-              width: '36px', height: '36px', borderRadius: '50%',
-              background: '#0f3460', color: '#fff',
+              width: '34px', height: '34px', borderRadius: '50%',
+              background: 'var(--accent)', color: '#fff',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: 700, fontSize: '0.875rem',
+              fontWeight: 700, fontSize: '0.875rem', flexShrink: 0,
             }}>
               {(user?.nombre || 'O')[0].toUpperCase()}
             </div>
           </div>
         </div>
 
-        {/* Content */}
-        <div style={{ padding: '2rem' }}>{children}</div>
+        {/* Contenido */}
+        <div style={{ padding: '2rem' }}>
+          {children}
+        </div>
       </main>
     </div>
   )

@@ -13,8 +13,10 @@ import AdminInventario from '../../components/admin/AdminInventario'
 import AdminMovimientos from '../../components/admin/AdminMovimientos'
 import AdminDescuentos from '../../components/admin/AdminDescuentos'
 import AdminReportes from '../../components/admin/AdminReportes'
+import AdminWhatsApp from '../../components/admin/AdminWhatsApp'
 
 function AdminPage() {
+
   const [activeSection, setActiveSection] = useState('dashboard')
 
   function renderSection() {
@@ -32,6 +34,7 @@ function AdminPage() {
       case 'movimientos':    return <AdminMovimientos />
       case 'descuentos':     return <AdminDescuentos />
       case 'reportes':       return <AdminReportes />
+      case 'whatsapp':       return <AdminWhatsApp />
       default:               return <AdminDashboard />
     }
   }

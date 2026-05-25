@@ -110,4 +110,9 @@ export const getReporteDiario  = ()       => api.get('/reportes/diario')
 export const getReporteMensual = ()       => api.get('/reportes/mensual')
 export const getTopProductos   = ()       => api.get('/reportes/top-productos')
 
+// ── WhatsApp (QR) ────────────────────────────────────────────────
+export const getWhatsAppQr = () => api.get('/whatsapp/qr')
+export const regenerateWhatsAppQr = () => api.post('/whatsapp/qr/regenerate', {})
+export const getWhatsAppStatus = () => api.get('/whatsapp/status')
+
 export default api

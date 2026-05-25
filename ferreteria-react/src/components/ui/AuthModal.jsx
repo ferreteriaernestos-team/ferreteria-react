@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import { useAuth } from '../../context/AuthContext'
 
 function AuthModal() {
+  const closeBtnRef = useRef(null)
+  const previouslyFocusedRef = useRef(null)
+  const firstFieldRef = useRef(null)
   const { authOpen, setAuthOpen, showToast } = useCart()
   const { login, register, loading, error } = useAuth()
   const navigate = useNavigate()
@@ -14,7 +17,32 @@ function AuthModal() {
   const [registerForm, setRegisterForm] = useState({ nombre: '', apellido: '', email: '', password: '' })
   const [terms, setTerms] = useState(false)
 
-  if (!authOpen) return null
+  useEffect(() => {
+    if (!authOpen) return
+
+    previouslyFocusedRef.current = document.activeElement
+
+    // En el siguiente frame, enfocamos el primer control del modal.
+    const t = window.setTimeout(() => {
+      firstFieldRef.current?.focus?.()
+    }, 0)
+
+    function onKeyDown(e) {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setAuthOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      window.clearTimeout(t)
+      window.removeEventListener('keydown', onKeyDown)
+      // Restaurar foco al cerrar
+      previouslyFocusedRef.current?.focus?.()
+    }
+  }, [authOpen, setAuthOpen])
 
   async function handleLogin(e) {
     e.preventDefault()
@@ -47,14 +75,15 @@ function AuthModal() {
   return (
     <>
       <div className="auth-overlay open" onClick={() => setAuthOpen(false)} />
-      <div className="auth-modal open">
-        <button className="auth-modal__close" onClick={() => setAuthOpen(false)}>
+      <div className="auth-modal open" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+        <button className="auth-modal__close" onClick={() => setAuthOpen(false)} type="button" ref={closeBtnRef}>
+
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
 
-        <div className="auth-modal__logo">Ferretería <span>Ernesto's</span></div>
+        <div id="auth-modal-title" className="auth-modal__logo">Ferretería <span>Ernesto's</span></div>
 
         <div className="auth-tabs">
           <button className={`auth-tab ${tab === 'login' ? 'active' : ''}`} onClick={() => setTab('login')}>
@@ -81,6 +110,7 @@ function AuthModal() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
                 <input
+                  ref={firstFieldRef}
                   type="email" placeholder="tu@correo.com" className="auth-form__input"
                   value={loginForm.email}
                   onChange={e => setLoginForm(p => ({ ...p, email: e.target.value }))}
